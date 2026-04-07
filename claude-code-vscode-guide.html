@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code × VS Code — Free AI Coding Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #10131a;
+    --surface2: #181c26;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #00d4ff;
+    --accent2: #00ff9d;
+    --amber: #ffb830;
+    --purple: #a78bfa;
+    --danger: #ff6b6b;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Sora', sans-serif;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ───────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: 72px 40px 64px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% -10%, rgba(0,212,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(0,255,157,0.07) 0%, transparent 60%);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 999px;
+    padding: 5px 14px;
+    margin-bottom: 24px;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  h1 span.hl {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    max-width: 580px;
+    margin: 0 auto 36px;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 300;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+
+  /* ── LAYOUT ─────────────────────────────── */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── SECTION HEADERS ────────────────────── */
+  .section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  p { color: var(--muted); margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── TOOLS GRID ─────────────────────────── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .tool-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+  .tool-icon {
+    font-size: 24px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .tool-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .tool-role {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .tool-desc { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6; }
+  .role-editor { color: var(--purple); }
+  .role-runtime { color: var(--amber); }
+  .role-bridge { color: var(--accent2); }
+  .role-agent { color: var(--accent); }
+  .role-model { color: #ff8fab; }
+  .tool-free {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.2);
+    border-radius: 999px;
+    padding: 3px 9px;
+  }
+
+  /* ── STEPS ──────────────────────────────── */
+  .steps { display: flex; flex-direction: column; gap: 0; margin-top: 28px; }
+  .step {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 0 24px;
+    position: relative;
+  }
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 31px;
+    top: 52px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-num-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2px;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-body { padding: 0 0 40px; }
+  .step-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+  .step-desc { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+
+  /* ── CODE BLOCKS ────────────────────────── */
+  .code-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .code-lang {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .copy-btn {
+    font-size: 11px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--sans);
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .copy-btn:hover { color: var(--accent); background: rgba(0,212,255,0.08); }
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .kw { color: var(--accent); }
+  .str { color: var(--accent2); }
+  .cmt { color: var(--muted); }
+  .model-name { color: var(--amber); }
+
+  /* ── LINK PILLS ─────────────────────────── */
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.07);
+    border: 1px solid rgba(0,212,255,0.18);
+    border-radius: 999px;
+    padding: 5px 14px;
+    text-decoration: none;
+    transition: background 0.15s;
+    margin: 4px 4px 4px 0;
+  }
+  .link-pill:hover { background: rgba(0,212,255,0.14); }
+
+  /* ── COMMAND SPOTLIGHT ───────────────────── */
+  .cmd-spotlight {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px 24px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .cmd-spotlight::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  }
+  .cmd-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .cmd-line {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .cmd-part-tool { color: var(--accent); }
+  .cmd-part-action { color: var(--purple); }
+  .cmd-part-flag { color: var(--muted); }
+  .cmd-part-model { color: var(--amber); }
+  .cmd-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .cmd-note-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .cmd-note-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  /* ── PROMPTING TIPS ─────────────────────── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .tip-card {
+    border-radius: var(--radius);
+    padding: 18px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .tip-good {
+    background: rgba(0,255,157,0.06);
+    border: 1px solid rgba(0,255,157,0.15);
+  }
+  .tip-bad {
+    background: rgba(255,107,107,0.06);
+    border: 1px solid rgba(255,107,107,0.12);
+  }
+  .tip-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tip-good .tip-label { color: var(--accent2); }
+  .tip-bad  .tip-label { color: var(--danger); }
+  .tip-example {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--text);
+    margin-top: 10px;
+    line-height: 1.7;
+  }
+
+  /* ── CALLOUT ────────────────────────────── */
+  .callout {
+    display: flex;
+    gap: 12px;
+    background: rgba(255,184,48,0.07);
+    border: 1px solid rgba(255,184,48,0.2);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 20px 0;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+
+  /* ── ARCHITECTURE DIAGRAM ───────────────── */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin: 28px 0;
+    overflow-x: auto;
+  }
+
+  /* ── FOOTER ─────────────────────────────── */
+  .footer {
+    padding: 40px 0;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 48px 20px 40px; }
+    .container { padding: 0 16px; }
+    .step { grid-template-columns: 48px 1fr; }
+    .cmd-spotlight { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Free Setup — No Subscription Required
+    </div>
+    <h1>
+      <span class="hl">Claude Code</span> × VS Code<br>
+      Complete Setup Guide
+    </h1>
+    <p class="hero-sub">
+      Build websites, MVPs, and apps with an AI coding agent — entirely free,
+      powered by Ollama and Minimax M2.7. No paid API keys, no cloud credits.
+    </p>
+   
+  </div>
+</div>
+
+<!-- ── TOOLS ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">Prerequisites</div>
+    <h2>What You'll Install</h2>
+    <p>Five tools work together to give you a fully local, free AI coding environment. Each plays a specific role.</p>
+
+    <div class="tools-grid">
+      <div class="tool-card">
+        <span class="tool-icon">🖥️</span>
+        <div class="tool-free">Free</div>
+        <div class="tool-name">VS Code</div>
+        <div class="tool-role role-editor">Code Editor</div>
+        <p class="tool-desc">Your workspace where you write, preview, and manage project files. The foundation everything else runs inside.</p>
+        <a class="link-pill" href="https://code.visualstudio.com" style="margin-top:12px;font-size:12px">code.visualstudio.com ↗</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="tool-icon">⚙️</span>
+        <div class="tool-free">Free</div>
+        <div class="tool-name">Node.js</div>
+        <div class="tool-role role-runtime">JavaScript Runtime</div>
+        <p class="tool-desc">The behind-the-scenes engine that lets your PC execute JavaScript programs. Required because Claude Code is built with JavaScript.</p>
+        <a class="link-pill" href="https://nodejs.org" style="margin-top:12px;font-size:12px">nodejs.org ↗</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="tool-icon">🦙</span>
+        <div class="tool-free">Free</div>
+        <div class="tool-name">Ollama</div>
+        <div class="tool-role role-bridge">AI Bridge</div>
+        <p class="tool-desc">Acts as the connector between Claude Code (the agent) and the AI model (the brain). Without it, the two can't communicate.</p>
+        <a class="link-pill" href="https://ollama.com" style="margin-top:12px;font-size:12px">ollama.com ↗</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="tool-icon">🤖</span>
+        <div class="tool-free">Free</div>
+        <div class="tool-name">Claude Code</div>
+        <div class="tool-role role-agent">AI Coding Agent</div>
+        <p class="tool-desc">The AI assistant you give prompts to. It reads your files, writes code, makes edits, and delivers the finished product.</p>
+        <a class="link-pill" href="https://claude.ai/code" style="margin-top:12px;font-size:12px">claude.ai/code ↗</a>
+      </div>
+
+      <div class="tool-card">
+        <span class="tool-icon">✨</span>
+        <div class="tool-free">Cloud</div>
+        <div class="tool-name">Minimax M2.7</div>
+        <div class="tool-role role-model">AI Brain (via Ollama)</div>
+        <p class="tool-desc">The powerful AI model that does the actual reasoning. Runs on Ollama's servers — no local GPU required, no disk space consumed.</p>
+        <a class="link-pill" href="https://ollama.com/library/minimax-m2.7" style="margin-top:12px;font-size:12px">Minimax-m2.7 ↗</a>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:24px">
+      <span class="callout-icon">💡</span>
+      <span>Claude Code normally requires a <strong>$17/month Pro subscription</strong> on claude.ai. This guide bypasses that entirely using Ollama as the model provider — you get the same agentic coding experience for free.</span>
+    </div>    
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <h2>How the Pieces Connect</h2>
+    <p>Understanding the data flow helps you debug issues and make the right configuration choices.</p>
+
+    <div class="arch-diagram">
+      <svg width="100%" viewBox="0 0 780 160" xmlns="http://www.w3.org/2000/svg" style="font-family:'Sora',sans-serif">
+        <!-- You -->
+        <rect x="20" y="50" width="130" height="60" rx="10" fill="rgba(167,139,250,0.12)" stroke="rgba(167,139,250,0.35)" stroke-width="1"/>
+        <text x="85" y="76" text-anchor="middle" font-size="12" fill="#a78bfa" font-weight="600">You</text>
+        <text x="85" y="94" text-anchor="middle" font-size="11" fill="#7a8099">write a prompt</text>
+
+        <!-- Arrow 1 -->
+        <line x1="150" y1="80" x2="196" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+        <!-- Claude Code -->
+        <rect x="196" y="44" width="148" height="72" rx="10" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.28)" stroke-width="1"/>
+        <text x="270" y="72" text-anchor="middle" font-size="12" fill="#00d4ff" font-weight="600">Claude Code</text>
+        <text x="270" y="90" text-anchor="middle" font-size="11" fill="#7a8099">AI coding agent</text>
+        <text x="270" y="106" text-anchor="middle" font-size="10" fill="#5a6070">reads &amp; writes files</text>
+
+        <!-- Arrow 2 -->
+        <line x1="344" y1="80" x2="388" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+        <!-- Ollama -->
+        <rect x="388" y="44" width="148" height="72" rx="10" fill="rgba(0,255,157,0.08)" stroke="rgba(0,255,157,0.28)" stroke-width="1"/>
+        <text x="462" y="72" text-anchor="middle" font-size="12" fill="#00ff9d" font-weight="600">Ollama</text>
+        <text x="462" y="90" text-anchor="middle" font-size="11" fill="#7a8099">bridge / router</text>
+        <text x="462" y="106" text-anchor="middle" font-size="10" fill="#5a6070">local software</text>
+
+        <!-- Arrow 3 -->
+        <line x1="536" y1="80" x2="582" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+        <!-- Minimax -->
+        <rect x="582" y="44" width="158" height="72" rx="10" fill="rgba(255,184,48,0.08)" stroke="rgba(255,184,48,0.28)" stroke-width="1"/>
+        <text x="661" y="72" text-anchor="middle" font-size="12" fill="#ffb830" font-weight="600">Minimax M2.7</text>
+        <text x="661" y="90" text-anchor="middle" font-size="11" fill="#7a8099">AI brain (cloud)</text>
+        <text x="661" y="106" text-anchor="middle" font-size="10" fill="#5a6070">no local install</text>
+
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M2 2L8 5L2 8" fill="none" stroke="#334155" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <p style="font-size:13px">
+      Your prompt → Claude Code interprets and plans → Ollama routes the request → Minimax M2.7 reasons and returns code → Claude Code writes files to your project → you see the result in the browser.
+    </p>
+  </div>
+</div>
+
+<!-- ── STEPS ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">Installation</div>
+    <h2>Step-by-Step Setup</h2>
+
+    <div class="steps">
+
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-num-wrap"><div class="step-num">01</div></div>
+        <div class="step-body">
+          <div class="step-title">Install VS Code</div>
+          <p class="step-desc">Download Visual Studio Code for your platform. This is your code editor — the place where your project files live and where Claude Code's results will appear.</p>
+          <a class="link-pill" href="https://code.visualstudio.com">Download VS Code ↗</a>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-num-wrap"><div class="step-num">02</div></div>
+        <div class="step-body">
+          <div class="step-title">Install Node.js</div>
+          <p class="step-desc">Claude Code is built with JavaScript and requires Node.js to run. Download the LTS version for your platform.</p>
+          <a class="link-pill" href="https://nodejs.org">Download Node.js ↗</a>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">Windows (PowerShell)</span><button class="copy-btn" onclick="navigator.clipboard.writeText('node --version')">Copy</button></div>
+            <pre><span class="cmt"># Verify installation</span>
+<span class="kw">node</span> --version</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <div class="step-num-wrap"><div class="step-num">03</div></div>
+        <div class="step-body">
+          <div class="step-title">Install Ollama</div>
+          <p class="step-desc">Ollama is the bridge between Claude Code and the AI model. Download and install it — it runs quietly in the background on your PC.</p>
+          <a class="link-pill" href="https://ollama.com">Download Ollama ↗</a>
+          <p class="step-desc" style="margin-top:10px">Supports Windows, macOS, and Linux. Click "Download for Windows" and run the installer.</p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <div class="step-num-wrap"><div class="step-num">04</div></div>
+        <div class="step-body">
+          <div class="step-title">Create a Free Ollama Account &amp; Sign In</div>
+          <p class="step-desc">Open the Ollama app → Settings → Sign In. This redirects you to the Ollama website. Create a free account (email only). This gives you access to cloud-hosted models like Minimax M2.7.</p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step">
+        <div class="step-num-wrap"><div class="step-num">05</div></div>
+        <div class="step-body">
+          <div class="step-title">Install Claude Code</div>
+          <p class="step-desc">Two methods — pick either one:</p>
+          <p class="step-desc" style="margin-top:6px"><strong style="color:var(--text)">Option A — npm (recommended):</strong></p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">Terminal / PowerShell</span><button class="copy-btn" onclick="navigator.clipboard.writeText('npm install -g @anthropic-ai/claude-code')">Copy</button></div>
+            <pre><span class="kw">npm</span> install -g @anthropic-ai/claude-code</pre>
+          </div>
+          <p class="step-desc"><strong style="color:var(--text)">Option B — from Claude's website:</strong> Go to <code style="font-family:var(--mono);font-size:12px;color:var(--accent)">claude.ai/code</code>, copy the install command shown, paste into PowerShell and press Enter.</p>
+          <p class="step-desc">Verify the installation:</p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">PowerShell</span><button class="copy-btn" onclick="navigator.clipboard.writeText('claude --version')">Copy</button></div>
+            <pre><span class="kw">claude</span> --version
+<span class="cmt"># Expected output: 2.1.8 (or newer)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step">
+        <div class="step-num-wrap"><div class="step-num">06</div></div>
+        <div class="step-body">
+          <div class="step-title">Install the Claude Code VS Code Extension</div>
+          <p class="step-desc">In VS Code, open the Extensions panel (left sidebar), search for <strong style="color:var(--text)">Claude Code</strong>, and install the first result. This lets you use Claude Code directly inside VS Code without opening a separate terminal each time.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── THE COMMAND ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">The Key Command</div>
+    <h2>Launching Claude Code</h2>
+    <p>Once everything is installed, a single command starts your AI coding session. Open a New Terminal in VS Code, navigate to your project folder, and run:</p>
+
+    <div class="cmd-spotlight">
+      <div class="cmd-label">📋 Bookmark this command</div>
+      <div class="cmd-line">
+        <span class="cmd-part-tool">ollama</span>&nbsp;
+        <span class="cmd-part-action">launch</span>&nbsp;
+        <span class="cmd-part-flag">claude</span>&nbsp;
+        <span class="cmd-part-flag">--model</span>&nbsp;
+        <span class="cmd-part-model">minimax-m2.7:cloud</span>
+      </div>
+      <div class="cmd-note">
+        <div class="cmd-note-item">
+          <div class="cmd-note-dot" style="background:var(--accent)"></div>
+          <span><code style="font-family:var(--mono);font-size:11px;color:var(--accent)">ollama</code> — starts the bridge app you installed</span>
+        </div>
+        <div class="cmd-note-item">
+          <div class="cmd-note-dot" style="background:var(--purple)"></div>
+          <span><code style="font-family:var(--mono);font-size:11px;color:var(--purple)">launch claude</code> — auto-setup, no manual config</span>
+        </div>
+        <div class="cmd-note-item">
+          <div class="cmd-note-dot" style="background:var(--amber)"></div>
+          <span><code style="font-family:var(--mono);font-size:11px;color:var(--amber)">minimax-m2.7:cloud</code> — the AI brain (runs on Ollama's servers)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">VS Code Terminal</span><button class="copy-btn" onclick="navigator.clipboard.writeText('ollama launch claude --model minimax-m2.7:cloud')">Copy</button></div>
+      <pre><span class="cmt"># In VS Code: Terminal → New Terminal</span>
+<span class="kw">ollama</span> launch <span class="str">claude</span> --model <span class="model-name">minimax-m2.7:cloud</span>
+
+<span class="cmt"># You'll see:</span>
+<span class="cmt"># Launching Claude Code with Minimax M2.7...</span>
+<span class="cmt"># ✓ Ready. Type your prompt below.</span></pre>
+    </div>
+
+    <div style="margin-top:32px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg)">
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:14px">Using Ollama as an API</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Ollama exposes a REST API you can call directly. The base URL is <code style="background:rgba(0,212,255,0.1);padding:2px 6px;border-radius:4px;color:#00d4ff">http://localhost:11434</code>.</p>
+      <div class="code-block" style="margin:0 0 14px">
+        <div class="code-header"><span class="code-lang">Generate a completion</span></div>
+        <pre style="padding:12px;font-size:12px"><span class="kw">curl</span> http://localhost:11434/api/generate -d <span class="str">'{"model": "minimax-m2.7:cloud", "prompt": "Hello!"}'</span></pre>
+      </div>
+      <div class="code-block" style="margin:0 0 14px">
+        <div class="code-header"><span class="code-lang">Chat completion</span></div>
+        <pre style="padding:12px;font-size:12px"><span class="kw">curl</span> http://localhost:11434/api/chat -d <span class="str">'{"model": "minimax-m2.7:cloud", "messages": [{"role": "user", "content": "Hi"}]}'</span></pre>
+      </div>
+      <div class="code-block" style="margin:0">
+        <div class="code-header"><span class="code-lang">List available models</span></div>
+        <pre style="padding:12px;font-size:12px"><span class="kw">curl</span> http://localhost:11434/api/tags</pre>
+      </div>
+      <a class="link-pill" href="https://docs.ollama.com/api/introduction" style="margin-top:14px;display:inline-block">Ollama API Docs ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── USAGE ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">Usage</div>
+    <h2>Building Your First Project</h2>
+    <p>Once Claude Code is running, type your request directly in the terminal prompt. The agent will ask permission before creating files — click <strong style="color:var(--text)">Yes</strong> when prompted. It will then generate all code and deliver a working project.</p>
+
+    <div class="callout">
+      <span class="callout-icon">⚡</span>
+      <span>After confirming file creation, Claude Code writes <em>all</em> the code autonomously. You don't touch a line of code — just review the result in your browser.</span>
+    </div>
+
+    <h3 style="margin-top:28px;margin-bottom:14px">Example: Landing Page</h3>
+    <p>The tutorial demo built a full landing page for "Code Unveil" — an AI & data science learning platform. Here's the prompt used:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Claude Code Prompt</span><button class="copy-btn" onclick="navigator.clipboard.writeText(`Make a dark landing page for Code Unveil — a website that teaches Data Science, AI, and Coding. It should look cool with a dark background, modern design, bright blue and green highlights. Include a top hero section with a catchy headline and a sign-up button, show how many active users are on the platform, add a footer, and add some smooth animations to make it feel alive.`)">Copy</button></div>
+      <pre style="white-space:pre-wrap">Make a dark landing page for Code Unveil — a website that
+teaches Data Science, AI, and Coding. It should look cool
+with a dark background, modern design, bright blue and green
+highlights. Include a top hero section with a catchy headline
+and a sign-up button, show how many active users are on the
+platform, add a footer, and add some smooth animations to
+make it feel alive.</pre>
+    </div>
+
+    <p>Result: a fully animated, multi-section HTML/CSS page with a hero, stat counters, course cards, and footer — zero manual coding.</p>
+  </div>
+</div>
+
+<!-- ── PROMPTING TIPS ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">Pro Tips</div>
+    <h2>Writing Prompts That Work</h2>
+    <p>Think of Claude Code like a junior developer — talented, but it needs clear direction. The more context you give, the better the result. Here's how developers get the best outputs:</p>
+
+    <div class="tips-grid">
+      <div class="tip-card tip-bad">
+        <div class="tip-label">✕ Vague prompt</div>
+        <p style="margin:0;color:var(--muted)">No context, no direction. Results in generic or off-target code.</p>
+        <div class="tip-example">"Make a website"</div>
+      </div>
+      <div class="tip-card tip-good">
+        <div class="tip-label">✓ Detailed prompt</div>
+        <p style="margin:0;color:var(--muted)">Includes purpose, features, style, and expected behaviour.</p>
+        <div class="tip-example">"Create a restaurant landing page for 'Sakura House' with a menu section, gallery, and booking form. Use a dark elegant theme with gold accents."</div>
+      </div>
+
+      <div class="tip-card tip-bad">
+        <div class="tip-label">✕ Unclear bug report</div>
+        <p style="margin:0;color:var(--muted)">No file path, no reproduction steps, no expected vs actual behaviour.</p>
+        <div class="tip-example">"Fix the bug"<br>"Something broke"<br>"It doesn't work"</div>
+      </div>
+      <div class="tip-card tip-good">
+        <div class="tip-label">✓ Precise bug report</div>
+        <p style="margin:0;color:var(--muted)">Pinpoints the exact component, describes the exact issue and expected fix.</p>
+        <div class="tip-example">"The mobile menu stays open after clicking a nav link. It should close. Check /components/Navbar.jsx."<br><br>"Add a dark/light mode toggle in the top right of the navbar."</div>
+      </div>
+
+      <div class="tip-card tip-bad">
+        <div class="tip-label">✕ Ambiguous feedback</div>
+        <p style="margin:0;color:var(--muted)">Subjective terms leave too much room for interpretation.</p>
+        <div class="tip-example">"Improve the hero section"</div>
+      </div>
+      <div class="tip-card tip-good">
+        <div class="tip-label">✓ Concrete changes</div>
+        <p style="margin:0;color:var(--muted)">Lists exact properties to modify: size, color, spacing, effect.</p>
+        <div class="tip-example">"In the hero section, increase the H1 font size to 48px, add a linear gradient to the text color, and add a dark overlay behind the text for better readability."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUICK REFERENCE ── -->
+<div class="section">
+  <div class="container">
+    <div class="section-label">Quick Reference</div>
+    <h2>Cheat Sheet</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:20px">
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:14px">Download Links</h3>
+        <a class="link-pill" href="https://code.visualstudio.com" style="display:block;margin:6px 0;border-radius:8px;padding:8px 14px">🖥️ VS Code</a>
+        <a class="link-pill" href="https://nodejs.org" style="display:block;margin:6px 0;border-radius:8px;padding:8px 14px">⚙️ Node.js</a>
+        <a class="link-pill" href="https://ollama.com" style="display:block;margin:6px 0;border-radius:8px;padding:8px 14px">🦙 Ollama</a>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:14px">Key Commands</h3>
+        <div class="code-block" style="margin:0 0 10px">
+          <pre style="padding:10px 12px;font-size:12px"><span class="cmt"># Install Claude Code</span>
+npm install -g @anthropic-ai/claude-code</pre>
+        </div>
+        <div class="code-block" style="margin:0">
+          <pre style="padding:10px 12px;font-size:12px"><span class="cmt"># Launch session</span>
+ollama launch claude --model minimax-m2.7:cloud</pre>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:14px">Remember</h3>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
+          <li style="display:flex;gap:8px;font-size:13px;color:var(--muted)"><span style="color:var(--accent2)">✓</span> Be specific in every prompt</li>
+          <li style="display:flex;gap:8px;font-size:13px;color:var(--muted)"><span style="color:var(--accent2)">✓</span> Name the exact element when fixing bugs</li>
+          <li style="display:flex;gap:8px;font-size:13px;color:var(--muted)"><span style="color:var(--accent2)">✓</span> Describe colours, layout, feel</li>
+          <li style="display:flex;gap:8px;font-size:13px;color:var(--muted)"><span style="color:var(--accent2)">✓</span> Say Yes when Claude asks to create files</li>
+          <li style="display:flex;gap:8px;font-size:13px;color:var(--muted)"><span style="color:var(--danger)">✗</span> Don't use vague terms: "better", "cool", "fix it"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="container">
+    <p><em>How to Use AI to Write Code for FREE in VS Code</em> &mdash; By Vasudev</p>
+    <p style="margin-top:6px">Tools used: VS Code · Node.js · Ollama · Claude Code · Minimax M2.7</p>
+  </div>
+</div>
+
+</body>
+</html>
